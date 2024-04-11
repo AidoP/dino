@@ -1,0 +1,57 @@
+name: ci
+on:
+  pull_request:
+#  push:
+#    branches:
+#    - main
+
+jobs:
+  test:
+    env:
+      # Emit backtraces on panics.
+      RUST_BACKTRACE: 1
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - build: msrv
+          os: ubuntu-latest
+          rust: 1.75.0
+
+        - build: stable
+          os: ubuntu-latest
+          rust: stable
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install Just
+      uses: extractions/setup-just@v2
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: ${{ matrix.rust }}
+
+    - name: Build
+      run: just build
+
+    - name: Test
+      run: just test
+
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: stable
+        components: rustfmt, clippy
+
+    - name: Check formatting
+      run: just check

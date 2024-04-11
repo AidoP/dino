@@ -1,0 +1,12 @@
+[workspace]
+resolver = "2"
+members = ["crates/*"]
+
+[workspace.package]
+version = "0.0.0"
+edition = "2021"
+authors = ["Aidan Prangnell <aidan@trifuse.xyz>"]
+documentation = "https://github.com/AidoP/dino"
+homepage = "https://github.com/AidoP/dino"
+repository = "https://github.com/AidoP/dino"
+license = "MIT"

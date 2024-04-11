@@ -1,0 +1,6 @@
+[book]
+authors = ["Aidan Prangnell"]
+language = "en"
+multilingual = false
+src = "."
+title = "Dino"

@@ -1,0 +1,12 @@
+[package]
+name = "dino"
+description = "🦕 is a 3270 terminal emulator for VT100-style terminals."
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+documentation.workspace = true
+homepage.workspace = true
+repository.workspace = true
+license.workspace = true
+
+[dependencies]

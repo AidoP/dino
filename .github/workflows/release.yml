@@ -1,0 +1,59 @@
+name: release
+
+# Only do the release on x.y.z tags.
+on:
+  push:
+    tags:
+    - "[0-9]+.[0-9]+.[0-9]+"
+
+permissions:
+  contents: write
+
+jobs:
+  create-release:
+    name: create-release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get the release version from the tag
+        if: env.VERSION == ''
+        run: echo "VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
+      - name: Check that tag version and Cargo.toml version are the same
+        shell: bash
+        run: |
+          if ! grep -q "version = \"$VERSION\"" Cargo.toml; then
+            echo "version does not match Cargo.toml" >&2
+            exit 1
+          fi
+      - name: Create GitHub release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create "$VERSION" --draft --verify-tag --title "$VERSION"
+    outputs:
+      version: ${{ env.VERSION }}
+
+  create-docs:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install Just
+      uses: extractions/setup-just@v2
+
+    - name: Install mdBook
+      uses: peaceiris/actions-mdbook@v2
+      with:
+        mdbook-version: 'latest'
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: stable
+
+    - name: Build documentation
+      env:
+        RUSTDOCFLAGS: -D warnings
+      run: just doc
+
+    # TODO: deploy to pages and add to release
